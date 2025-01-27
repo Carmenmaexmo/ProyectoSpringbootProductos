@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mysql:
+    build:
+      context: ./mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bdspringboot
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  springboot-app:
+    build: .
+    container_name: springboot-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/bdspringboot
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+  client:
+    build: ./client
+    container_name: client
+    ports:
+      - "80:80"
+    depends_on:
+      - springboot-app
+
+volumes:
+  mysql-data:
